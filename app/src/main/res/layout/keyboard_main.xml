@@ -76,7 +76,9 @@
     android:layout_height="60dp" 
     android:layout_margin="2dp" 
     android:text="@string/label_symbols" 
-    android:backgroundTint="#2D2D2D" /><Button android:id="@+id/key_gif" android:layout_width="0dp" android:layout_weight="2" android:layout_height="60dp" android:layout_margin="2dp" android:text="GIF" android:backgroundTint="#2D2D2D" />
+    android:backgroundTint="#2D2D2D"
+    android:textAllCaps="false" />
+        <Button android:id="@+id/key_gif" android:layout_width="0dp" android:layout_weight="2" android:layout_height="60dp" android:layout_margin="2dp" android:text="GIF" android:backgroundTint="#2D2D2D" />
         <Button android:id="@+id/key_space" android:layout_width="0dp" android:layout_weight="5" android:layout_height="60dp" android:layout_margin="2dp" android:text=" " android:backgroundTint="#424242" />
         <Button android:id="@+id/key_enter" android:layout_width="0dp" android:layout_weight="2" android:layout_height="60dp" android:layout_margin="2dp" android:text="Enter" android:backgroundTint="#2D2D2D" />
     </LinearLayout>
