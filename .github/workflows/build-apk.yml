@@ -1,5 +1,6 @@
 name: Build PrivateType
 on: [push]
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -12,13 +13,14 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: gradle
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
 
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug
+      - name: Build with Gradle
+        # We use 'gradle' directly instead of './gradlew' 
+        # in case the wrapper files are missing from the mobile upload
+        run: gradle assembleDebug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
