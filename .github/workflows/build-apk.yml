@@ -17,10 +17,13 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build with Gradle
-        # We use 'gradle' directly instead of './gradlew' 
-        # in case the wrapper files are missing from the mobile upload
-        run: gradle assembleDebug
+      - name: Initialize Gradle Wrapper
+        # This creates the missing 'gradlew' file automatically
+        run: gradle wrapper
+
+      - name: Build APK
+        # We now use the wrapper we just created
+        run: ./gradlew assembleDebug --stacktrace
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
