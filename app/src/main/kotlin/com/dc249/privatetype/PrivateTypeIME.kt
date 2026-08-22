@@ -21,74 +21,68 @@ class PrivateTypeIME : InputMethodService() {
     private val handler = Handler(Looper.getMainLooper())
     private var backspaceRunnable: Runnable? = null
     
-    // Spacebar gesture variables
     private var lastX = 0f
-    private val threshold = 40f // Pixels moved before cursor shifts
+    private val threshold = 50f
 
     override fun onCreateInputView(): View {
         val root = layoutInflater.inflate(R.layout.keyboard_main, null)
         val flipper = root.findViewById<ViewFlipper>(R.id.keyboard_flipper)
         
-        setupKeyListeners(root)
-        setupSpacebarGesture(root)
-        setupBackspaceRepeat(root)
+        setupAlphabetKeys(root)
+        setupSpacebar(root)
+        setupBackspace(root)
         
-        // Symbols Toggle
+        // Mode Toggle (?123 <-> ABC)
         root.findViewById<Button>(R.id.key_mode_toggle).setOnClickListener {
-            val btn = it as Button
             if (flipper.displayedChild == 0) {
                 flipper.displayedChild = 1
-                btn.text = "ABC"
+                (it as Button).text = "ABC"
             } else {
                 flipper.displayedChild = 0
-                btn.text = "?123"
+                (it as Button).text = "?123"
             }
+        }
+
+        root.findViewById<Button>(R.id.key_enter).setOnClickListener {
+            currentInputConnection.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER))
         }
 
         return root
     }
 
-    private fun setupKeyListeners(view: View) {
-        val letterIds = listOf(
+    private fun setupAlphabetKeys(view: View) {
+        val keys = listOf(
             R.id.key_q, R.id.key_w, R.id.key_e, R.id.key_r, R.id.key_t, R.id.key_y, R.id.key_u, R.id.key_i, R.id.key_o, R.id.key_p,
             R.id.key_a, R.id.key_s, R.id.key_d, R.id.key_f, R.id.key_g, R.id.key_h, R.id.key_j, R.id.key_k, R.id.key_l,
             R.id.key_z, R.id.key_x, R.id.key_c, R.id.key_v, R.id.key_b, R.id.key_n, R.id.key_m
         )
-        
-        letterIds.forEach { id ->
+        keys.forEach { id ->
             view.findViewById<Button>(id)?.setOnClickListener { 
-                val text = (it as Button).text.toString()
-                currentInputConnection.commitText(text, 1)
+                currentInputConnection.commitText((it as Button).text, 1)
             }
-        }
-
-        view.findViewById<Button>(R.id.key_enter).setOnClickListener {
-            currentInputConnection.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER))
         }
     }
 
-    private fun setupSpacebarGesture(view: View) {
+    private fun setupSpacebar(view: View) {
         val space = view.findViewById<Button>(R.id.key_space)
         space.setOnTouchListener { v, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     lastX = event.x
-                    false // Return false to allow click listener for actual space
+                    false 
                 }
                 MotionEvent.ACTION_MOVE -> {
                     val deltaX = event.x - lastX
                     if (abs(deltaX) > threshold) {
-                        if (deltaX > 0) {
-                            currentInputConnection.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_RIGHT))
-                        } else {
-                            currentInputConnection.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_LEFT))
-                        }
+                        val key = if (deltaX > 0) KeyEvent.KEYCODE_DPAD_RIGHT else KeyEvent.KEYCODE_DPAD_LEFT
+                        currentInputConnection.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, key))
                         lastX = event.x
                     }
                     true
                 }
                 MotionEvent.ACTION_UP -> {
-                    if (abs(event.x - lastX) < threshold) v.performClick()
+                    if (abs(event.x - lastX) < threshold) currentInputConnection.commitText(" ", 1)
+                    v.performClick()
                     true
                 }
                 else -> false
@@ -96,16 +90,15 @@ class PrivateTypeIME : InputMethodService() {
         }
     }
 
-    private fun setupBackspaceRepeat(view: View) {
+    private fun setupBackspace(view: View) {
         val backspace = view.findViewById<Button>(R.id.key_backspace)
         backspace.setOnTouchListener { _, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    handler.removeCallbacksAndMessages(null)
                     backspaceRunnable = object : Runnable {
                         override fun run() {
                             currentInputConnection.deleteSurroundingText(1, 0)
-                            handler.postDelayed(this, 100) // 100ms repeat rate
+                            handler.postDelayed(this, 100)
                         }
                     }
                     handler.post(backspaceRunnable!!)
