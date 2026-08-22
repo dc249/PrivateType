@@ -1,1 +1,5 @@
-<resources><string name="app_name">PrivateType</string></resources>
+<resources>
+    <string name="app_name">PrivateType</string>
+    <string name="privacy_check">Privacy Audit: No Internet permission declared.</string>
+    <string name="import_gif">Import Local GIF</string>
+</resources>
