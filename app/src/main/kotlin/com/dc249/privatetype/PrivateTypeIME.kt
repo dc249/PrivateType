@@ -34,12 +34,13 @@ class PrivateTypeIME : InputMethodService() {
         
         // Mode Toggle (?123 <-> ABC)
         root.findViewById<Button>(R.id.key_mode_toggle).setOnClickListener {
+            val btn = it as Button
             if (flipper.displayedChild == 0) {
                 flipper.displayedChild = 1
-                (it as Button).text = "ABC"
+                btn.text = getString(R.string.label_letters)
             } else {
                 flipper.displayedChild = 0
-                (it as Button).text = "?123"
+                btn.text = getString(R.string.label_symbols)
             }
         }
 
