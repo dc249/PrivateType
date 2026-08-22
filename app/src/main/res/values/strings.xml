@@ -3,6 +3,6 @@
     <string name="app_name">PrivateType</string>
     <string name="privacy_info">Privacy: No Internet permission declared. Offline-only.</string>
     <string name="import_gif">Import Local GIF</string>
-    <string name="label_symbols">?123</string>
+    <string name="label_symbols">\?123</string>
     <string name="label_letters">ABC</string>
 </resources>
